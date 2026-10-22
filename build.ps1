@@ -59,6 +59,7 @@ jpackage `
   --icon src/main/resources/icon.ico `
   --add-modules $modules `
   --java-options "-Dfile.encoding=UTF-8" `
+  --jlink-options "--strip-debug --no-man-pages --no-header-files" `
   --win-menu --win-shortcut --win-dir-chooser `
   --win-per-user-install `
   --win-upgrade-uuid $UpgradeUuid `

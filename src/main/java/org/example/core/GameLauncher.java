@@ -110,11 +110,61 @@ public final class GameLauncher {
         if (cfg.javaPath != null && !cfg.javaPath.isBlank()) return cfg.javaPath.trim();
         int need = json.has("javaVersion") ? json.getAsJsonObject("javaVersion").get("majorVersion").getAsInt() : 8;
         int have = Runtime.version().feature();
+        String exeName = Rules.os().equals("windows") ? "java.exe" : "java";
+
+        // 1) Java, на которой работает сам лаунчер (если в ней есть java.exe и версия подходит)
+        Path own = Path.of(System.getProperty("java.home"), "bin", exeName);
+        if (have >= need && Files.isRegularFile(own)) return own.toString();
+
+        // 2) Встроенная Java установщика может быть без java.exe — ищем установленную в системе (JAVA_HOME, PATH)
+        String system = findSystemJava(exeName, need);
+        if (system != null) return system;
+
         if (have < need) {
             throw new IOException("Для этой версии нужна Java " + need + " (сейчас " + have + "). Укажите путь к Java в настройках.");
         }
-        String exe = Rules.os().equals("windows") ? "java.exe" : "java";
-        return Path.of(System.getProperty("java.home"), "bin", exe).toString();
+        throw new IOException("Не найден java.exe: во встроенной Java лаунчера его нет, а установленная Java " + need
+                + "+ не обнаружена. Установите JDK " + need + " и укажите путь к java.exe в настройках.");
+    }
+
+    private static String findSystemJava(String exeName, int need) {
+        List<Path> candidates = new ArrayList<>();
+        String home = System.getenv("JAVA_HOME");
+        if (home != null && !home.isBlank()) {
+            try { candidates.add(Path.of(home.trim().replace("\"", ""), "bin", exeName)); } catch (Exception ignored) {}
+        }
+        String path = System.getenv("PATH");
+        if (path != null) {
+            for (String dir : path.split(File.pathSeparator)) {
+                if (dir.isBlank()) continue;
+                try { candidates.add(Path.of(dir.trim().replace("\"", ""), exeName)); } catch (Exception ignored) {}
+            }
+        }
+        for (Path c : candidates) {
+            if (Files.isRegularFile(c) && majorVersion(c) >= need) return c.toString();
+        }
+        return null;
+    }
+
+    /** Основная версия Java по выводу «java -version» (21, 17, 8…) или -1. */
+    private static int majorVersion(Path javaExe) {
+        Process p = null;
+        try {
+            p = new ProcessBuilder(javaExe.toString(), "-version").redirectErrorStream(true).start();
+            String line;
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))) {
+                line = r.readLine();
+            }
+            if (line == null) return -1;
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("version \"(\\d+)(?:\\.(\\d+))?").matcher(line);
+            if (!m.find()) return -1;
+            int first = Integer.parseInt(m.group(1));
+            return first == 1 && m.group(2) != null ? Integer.parseInt(m.group(2)) : first;
+        } catch (Exception e) {
+            return -1;
+        } finally {
+            if (p != null) p.destroy();
+        }
     }
 
     private static List<String> expand(JsonArray arr, Map<String, String> vars) {

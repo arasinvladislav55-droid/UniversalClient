@@ -11,7 +11,7 @@ import java.util.List;
 /** Настройки лаунчера (хранятся в launcher.json). */
 public class Config {
     public static final String DEFAULT_VERSION = "1.21.11";
-    public static final String LAUNCHER_VERSION = "2.7.0";
+    public static final String LAUNCHER_VERSION = "2.5.0";
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = Dirs.ROOT.resolve("launcher.json");
@@ -36,6 +36,9 @@ public class Config {
     public List<String> seenPages = new ArrayList<>();
     public boolean discordEnabled = true;
     public String discordAppId = "";
+    /** Последняя версия и список изменений с GitHub (для блока «Что нового»). */
+    public String newsVersion = "";
+    public String newsNotes = "";
 
     public static Config load() {
         try {
@@ -46,6 +49,8 @@ public class Config {
                     if (c.version == null || c.version.isBlank()) c.version = DEFAULT_VERSION;
                     if (c.discordAppId == null) c.discordAppId = "";
                     if (c.theme == null) c.theme = "purple";
+                    if (c.newsVersion == null) c.newsVersion = "";
+                    if (c.newsNotes == null) c.newsNotes = "";
                     if (c.servers == null) c.servers = new ArrayList<>();
                     if (c.seenPages == null) c.seenPages = new ArrayList<>();
                     if (c.lastVersion == null) c.lastVersion = "";

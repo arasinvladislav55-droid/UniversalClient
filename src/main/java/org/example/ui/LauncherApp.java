@@ -80,6 +80,7 @@ public class LauncherApp extends Application {
     private final List<CubeArt> cubes = new ArrayList<>();
     private final List<Node> statCards = new ArrayList<>();
     private Node newsCard, quickCard;
+    private VBox newsBox;
     private final Label statVersion = new Label();
     private final Label statRam = new Label();
     private final Label statPlay = new Label();
@@ -495,16 +496,12 @@ public class LauncherApp extends Application {
         statRam.setText(Fx.formatRam(cfg.ramMb));
 
         // ── что нового + быстрый доступ ──
-        Label newsTitle = new Label("Что нового");
-        newsTitle.getStyleClass().add("card-title");
-        VBox news = new VBox(9, newsTitle,
-                newsItem("2.3.0", "Новое меню, темы, скриншоты и профиль", true),
-                newsItem("2.2.1", "Discord Rich Presence — статус в профиле", false),
-                newsItem("2.1.0", "Выбор версий Minecraft 1.19 — 1.21.11", false));
-        news.getStyleClass().add("card");
-        news.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(news, Priority.ALWAYS);
-        newsCard = news;
+        newsBox = new VBox(9);
+        newsBox.getStyleClass().add("card");
+        newsBox.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(newsBox, Priority.ALWAYS);
+        newsCard = newsBox;
+        rebuildNews();
 
         Label quickTitle = new Label("Быстрый доступ");
         quickTitle.getStyleClass().add("card-title");
@@ -526,7 +523,7 @@ public class LauncherApp extends Application {
         quick.setMinWidth(290);
         quickCard = quick;
 
-        HBox bottom = new HBox(14, news, quick);
+        HBox bottom = new HBox(14, newsBox, quick);
         bottom.setPrefHeight(150);
         bottom.setMaxHeight(150);
 
@@ -555,6 +552,30 @@ public class LauncherApp extends Application {
         return card;
     }
 
+    /** «Что нового»: сверху — последняя версия и её список изменений из version.json на GitHub, ниже — прошлые. */
+    private void rebuildNews() {
+        Label title = new Label("Что нового");
+        title.getStyleClass().add("card-title");
+        newsBox.getChildren().setAll(title);
+
+        String v = cfg.newsVersion == null ? "" : cfg.newsVersion.trim();
+        if (v.isEmpty()) {
+            newsBox.getChildren().addAll(
+                    newsItem("2.3.0", "Новое меню, темы, скриншоты и профиль", true),
+                    newsItem("2.2.1", "Discord Rich Presence — статус в профиле", false),
+                    newsItem("2.1.0", "Выбор версий Minecraft 1.19 — 1.21.11", false));
+            return;
+        }
+        boolean newer = Updater.isNewer(v, Config.LAUNCHER_VERSION);
+        String notes = cfg.newsNotes == null ? "" : cfg.newsNotes.trim().replaceAll("\\s*\\R\\s*", "  •  ");
+        if (notes.isEmpty()) notes = newer ? "Вышло обновление — нажмите «ОБНОВИТЬ»" : "Исправления и улучшения";
+        else if (newer) notes = "Доступно обновление: " + notes;
+        newsBox.getChildren().addAll(
+                newsItem(v, notes, true),
+                newsItem("2.3.0", "Новое меню, темы, скриншоты и профиль", false),
+                newsItem("2.2.1", "Discord Rich Presence — статус в профиле", false));
+    }
+
     private Node newsItem(String ver, String text, boolean hot) {
         Label v = new Label(ver);
         v.getStyleClass().add(hot ? "tag-hot" : "tag");
@@ -562,6 +583,10 @@ public class LauncherApp extends Application {
         v.setAlignment(Pos.CENTER);
         Label t = new Label(text);
         t.getStyleClass().add("news-text");
+        t.setMinWidth(0);
+        t.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(t, Priority.ALWAYS);
+        Tooltip.install(t, new Tooltip(text));   // длинный текст обрезается «…» — целиком виден при наведении
         HBox row = new HBox(10, v, t);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
@@ -744,9 +769,21 @@ public class LauncherApp extends Application {
         });
         updateTimer.scheduleWithFixedDelay(() -> {
             if (updating) return;
-            Updater.Info info = Updater.check();
-            if (info != null) Platform.runLater(() -> onUpdateFound(info));
+            Updater.Info info = Updater.fetchLatest();
+            if (info != null) Platform.runLater(() -> onLatestInfo(info));
         }, 1, 15 * 60, TimeUnit.SECONDS);
+    }
+
+    /** Свежие данные с GitHub: обновляем блок «Что нового» и, если версия новее, включаем кнопку «ОБНОВИТЬ». */
+    private void onLatestInfo(Updater.Info info) {
+        String notes = info.notes() == null ? "" : info.notes();
+        if (!info.version().equals(cfg.newsVersion) || !notes.equals(cfg.newsNotes)) {
+            cfg.newsVersion = info.version();
+            cfg.newsNotes = notes;
+            cfg.save();
+            rebuildNews();
+        }
+        if (Updater.isNewer(info.version(), Config.LAUNCHER_VERSION)) onUpdateFound(info);
     }
 
     private void onUpdateFound(Updater.Info info) {
@@ -829,7 +866,15 @@ public class LauncherApp extends Application {
         if (logoutBtn != null) logoutBtn.setDisable(false);
         bar.setVisible(false);
         refreshPlayButton();
-        status.setText("Не удалось обновить: " + (ex == null ? "неизвестная ошибка" : ex.getMessage()));
+        String why = ex == null ? "неизвестная ошибка" : ex.getMessage();
+        if (pendingUpdate != null) {
+            // запасной путь: скачать установщик через браузер (там работают системные прокси/VPN)
+            status.setText("Не удалось скачать автоматически (" + why + "). Открыта страница загрузки — "
+                    + "скачайте и запустите установщик вручную.");
+            openUri(pendingUpdate.url());
+        } else {
+            status.setText("Не удалось обновить: " + why);
+        }
     }
 
     // ───────────────────────── Тема и эффекты ─────────────────────────
