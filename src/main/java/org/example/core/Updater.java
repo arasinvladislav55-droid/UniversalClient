@@ -27,13 +27,16 @@ import java.util.HexFormat;
  * Формат version.json:
  * {
  *   "version": "2.6.0",
- *   "url": "https://github.com/USER/REPO/releases/download/v2.5.0/UniversalClient-2.5.0.exe",
+ *   "url": "https://github.com/arasinvladislav55-droid/UniversalClient/releases/download/v2.6.0/UniversalClient-2.6.0.exe",
  *   "sha256": "…необязательно…",
  *   "notes": "Что нового (необязательно)"
  * }
  */
 public final class Updater {
-    /** Ссылка на version.json. ЗАМЕНИТЕ на свою (см. UPDATING.md). */
+    /** Страница релизов: https://github.com/arasinvladislav55-droid/UniversalClient/releases */
+    public static final String RELEASES_URL = "https://github.com/arasinvladislav55-droid/UniversalClient/releases";
+
+    /** Ссылка на version.json в корне репозитория (ветка master). */
     public static final String UPDATE_URL = "https://raw.githubusercontent.com/arasinvladislav55-droid/UniversalClient/master/version.json";
 
     public record Info(String version, String url, String sha256, String notes) {}
