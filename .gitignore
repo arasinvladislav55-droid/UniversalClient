@@ -1,0 +1,7 @@
+# сборка — в git не нужна (exe выкладывается в Releases)
+target/
+build/
+dist/
+# IDE
+.idea/
+*.iml
