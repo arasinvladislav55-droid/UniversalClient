@@ -34,7 +34,7 @@ import java.util.HexFormat;
  */
 public final class Updater {
     /** Ссылка на version.json. ЗАМЕНИТЕ на свою (см. UPDATING.md). */
-    public static final String UPDATE_URL = "https://raw.githubusercontent.com/arasinvladislav55-droid/Universal-Client/main/version.json";
+    public static final String UPDATE_URL = "https://raw.githubusercontent.com/arasinvladislav55-droid/Universal-Client/master/version.json";
 
     public record Info(String version, String url, String sha256, String notes) {}
 
