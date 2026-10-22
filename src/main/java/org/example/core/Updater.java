@@ -27,7 +27,7 @@ import java.util.HexFormat;
  * Формат version.json:
  * {
  *   "version": "2.6.0",
- *   "url": "https://github.com/USER/REPO/releases/download/v2.6.0/UniversalClient-2.5.0.exe",
+ *   "url": "https://github.com/USER/REPO/releases/download/v2.5.0/UniversalClient-2.5.0.exe",
  *   "sha256": "…необязательно…",
  *   "notes": "Что нового (необязательно)"
  * }
