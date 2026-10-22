@@ -27,13 +27,16 @@ import java.util.HexFormat;
  * Формат version.json:
  * {
  *   "version": "2.6.0",
- *   "url": "https://github.com/USER/REPO/releases/download/v2.5.0/UniversalClient-2.5.0.exe",
+ *   "url": "https://github.com/arasinvladislav55-droid/UniversalClient/releases/download/v2.6.0/UniversalClient-2.6.0.exe",
  *   "sha256": "…необязательно…",
  *   "notes": "Что нового (необязательно)"
  * }
  */
 public final class Updater {
-    /** Ссылка на version.json. ЗАМЕНИТЕ на свою (см. UPDATING.md). */
+    /** Страница релизов: https://github.com/arasinvladislav55-droid/UniversalClient/releases */
+    public static final String RELEASES_URL = "https://github.com/arasinvladislav55-droid/UniversalClient/releases";
+
+    /** Ссылка на version.json в корне репозитория (ветка master). */
     public static final String UPDATE_URL = "https://raw.githubusercontent.com/arasinvladislav55-droid/UniversalClient/master/version.json";
 
     public record Info(String version, String url, String sha256, String notes) {}
@@ -42,13 +45,13 @@ public final class Updater {
 
     private static final HttpClient HTTP = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)
-            .connectTimeout(Duration.ofSeconds(10))
+            .connectTimeout(Duration.ofSeconds(30))
             .build();
 
     private Updater() {}
 
-    /** Возвращает данные об обновлении или null, если обновлений нет / сервер недоступен. */
-    public static Info check() {
+    /** Читает version.json с GitHub: последняя опубликованная версия (новая она или нет) либо null, если сервер недоступен. */
+    public static Info fetchLatest() {
         if (UPDATE_URL.contains("USER/REPO")) {
             LogFile.write("[Updater] UPDATE_URL не настроен — проверка обновлений пропущена");
             return null;
@@ -59,11 +62,6 @@ public final class Updater {
             String version = str(o, "version");
             String url = str(o, "url");
             if (version.isBlank() || url.isBlank()) return null;
-            if (!isNewer(version, Config.LAUNCHER_VERSION)) {
-                LogFile.write("[Updater] Актуальная версия " + Config.LAUNCHER_VERSION);
-                return null;
-            }
-            LogFile.write("[Updater] Найдено обновление " + Config.LAUNCHER_VERSION + " → " + version);
             return new Info(version, url, str(o, "sha256"), str(o, "notes"));
         } catch (Exception e) {
             LogFile.write("[Updater] Не удалось проверить обновления: " + e);
@@ -71,8 +69,37 @@ public final class Updater {
         }
     }
 
-    /** Скачивает установщик во временную папку лаунчера и возвращает путь к нему. */
+    /** Возвращает данные об обновлении или null, если обновлений нет / сервер недоступен. */
+    public static Info check() {
+        Info info = fetchLatest();
+        if (info == null) return null;
+        if (!isNewer(info.version(), Config.LAUNCHER_VERSION)) {
+            LogFile.write("[Updater] Актуальная версия " + Config.LAUNCHER_VERSION);
+            return null;
+        }
+        LogFile.write("[Updater] Найдено обновление " + Config.LAUNCHER_VERSION + " → " + info.version());
+        return info;
+    }
+
+    /** Скачивает установщик во временную папку лаунчера (до 3 попыток при сетевых сбоях) и возвращает путь к нему. */
     public static Path download(Info info, Progress progress) throws IOException, InterruptedException {
+        IOException last = null;
+        for (int attempt = 1; attempt <= 3; attempt++) {
+            try {
+                return downloadOnce(info, progress);
+            } catch (IOException e) {
+                last = e;
+                LogFile.write("[Updater] Попытка " + attempt + "/3 не удалась: " + e);
+                if (attempt < 3) {
+                    progress.update(-1, "Нет соединения, повторная попытка " + (attempt + 1) + "/3…");
+                    Thread.sleep(2000L * attempt);
+                }
+            }
+        }
+        throw last;
+    }
+
+    private static Path downloadOnce(Info info, Progress progress) throws IOException, InterruptedException {
         Path dir = Dirs.ROOT.resolve("updates");
         Files.createDirectories(dir);
         String name = info.url().substring(info.url().lastIndexOf('/') + 1);
@@ -143,7 +170,7 @@ public final class Updater {
     }
 
     /** true, если a новее b (сравнение по числам: 2.10.0 > 2.9.0). */
-    static boolean isNewer(String a, String b) {
+    public static boolean isNewer(String a, String b) {
         int[] x = parse(a), y = parse(b);
         for (int i = 0; i < Math.max(x.length, y.length); i++) {
             int p = i < x.length ? x[i] : 0, q = i < y.length ? y[i] : 0;
