@@ -1,6 +1,6 @@
 {
-  "notes": "Исправления и улучшения",
-  "sha256": "a0e27df8169e0a6c7ce35b7b29aab13ea68dfa0ba6f4f4d0dc6afcb45a8e79a6",
-  "url": "https://github.com/arasinvladislav55-droid/UniversalClient/releases/download/v2.7.0/UniversalClient-2.7.0.exe",
-  "version": "2.7.0"
+    "version":  "2.7.0",
+    "url":  "https://github.com/arasinvladislav55-droid/UniversalClient/releases/download/v2.7.0/UniversalClient-2.7.0.exe",
+    "sha256":  "a0e27df8169e0a6c7ce35b7b29aab13ea68dfa0ba6f4f4d0dc6afcb45a8e79a6",
+    "notes":  "Исправления и улучшения"
 }
