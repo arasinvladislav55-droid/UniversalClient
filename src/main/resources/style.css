@@ -354,7 +354,8 @@
     -uc-a: #8b5cf6; -uc-b: #6366f1; -uc-c: #22d3ee;
     -uc-a-soft: #8b5cf626; -uc-a-mid: #8b5cf659; -uc-a-strong: #8b5cf699;
     -uc-c-soft: #22d3ee26; -uc-light: #c4b5fd;
-    -fx-background-color: linear-gradient(to bottom right, #0a0a11, #0e0e1a 55%, #120f20);
+    -uc-bg1: #0a0a11; -uc-bg2: #0e0e1a; -uc-bg3: #120f20;
+    -fx-background-color: linear-gradient(to bottom right, -uc-bg1, -uc-bg2 55%, -uc-bg3);
     -fx-background-radius: 16;
     -fx-border-color: linear-gradient(to bottom right, -uc-a-strong, #2a2a44 38%, #2a2a44 62%, -uc-c-soft);
     -fx-border-radius: 16;
@@ -643,3 +644,75 @@
 .srv-ok { -fx-text-fill: #34d399; }
 .srv-off { -fx-text-fill: #f87171; }
 .srv-wait { -fx-text-fill: #8b8ba7; }
+
+
+/* ═════════════ v2.9 — полировка оформления ═════════════ */
+
+/* ───── Меню ───── */
+.nav-button { -fx-font-size: 13.5px; }
+.nav-button:pressed { -fx-background-color: -uc-a-mid; }
+.nav-button:selected { -fx-background-radius: 12; }
+.nav-section { -fx-font-size: 10px; -fx-padding: 14 0 4 10; }
+.sidebar.compact .nav-button { -fx-padding: 6 14 6 14; -fx-font-size: 13px; }
+.sidebar.compact .nav-section { -fx-padding: 8 0 2 10; }
+.profile-card {
+    -fx-background-color: linear-gradient(to bottom right, -uc-a-soft, rgba(255,255,255,0.03));
+    -fx-border-color: -uc-a-soft;
+}
+
+/* ───── Карточки ───── */
+.card {
+    -fx-background-color: linear-gradient(to bottom, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255,255,255,0.07);
+    -fx-border-radius: 18;
+    -fx-padding: 20;
+}
+.card:hover { -fx-border-color: -uc-a-mid; }
+.stat-card {
+    -fx-background-color: linear-gradient(to bottom, rgba(255,255,255,0.06), rgba(255,255,255,0.025));
+    -fx-border-color: rgba(255,255,255,0.07);
+}
+.stat-card:hover { -fx-border-color: -uc-a-mid; -fx-effect: dropshadow(gaussian, -uc-a-soft, 18, 0, 0, 2); }
+.card-title { -fx-font-size: 15.5px; }
+.page-title { -fx-font-size: 27px; -fx-text-fill: linear-gradient(to right, white, -uc-light); }
+
+/* ───── Кнопки ───── */
+.quick-btn:pressed, .secondary-button:pressed, .chip-button:pressed { -fx-background-color: -uc-a-strong; }
+.home-play { -fx-effect: dropshadow(gaussian, -uc-a-mid, 22, 0, 0, 4); }
+.secondary-button { -fx-background-radius: 11; -fx-border-color: rgba(255,255,255,0.06); -fx-border-radius: 11; }
+.secondary-button:hover { -fx-border-color: -uc-a-mid; -fx-text-fill: white; }
+
+/* ───── Плитки тем и фонов ───── */
+.swatch { -fx-background-color: linear-gradient(to bottom, rgba(255,255,255,0.055), rgba(255,255,255,0.025)); -fx-border-color: rgba(255,255,255,0.07); }
+.swatch:hover { -fx-effect: dropshadow(gaussian, -uc-a-soft, 14, 0, 0, 2); }
+
+/* ───── Выбор цвета ───── */
+.uc-picker {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-background-radius: 9;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-radius: 9;
+    -fx-color-label-visible: false;
+    -fx-color-rect-width: 70;
+    -fx-cursor: hand;
+}
+.uc-picker:hover { -fx-border-color: -uc-a-strong; }
+.uc-picker .arrow-button { -fx-background-color: transparent; }
+.uc-picker .arrow { -fx-background-color: -uc-light; }
+
+/* ───── Слайдер ───── */
+.slider .track { -fx-background-color: #20203a; }
+.slider:disabled { -fx-opacity: 0.4; }
+.slider .thumb:hover { -fx-background-color: white; }
+
+/* ───── Чекбоксы, поля, скроллбар ───── */
+.uc-check { -fx-padding: 2 0 2 0; }
+.check-box .box { -fx-background-radius: 7; -fx-border-radius: 7; }
+.check-box:hover .box { -fx-border-color: -uc-a-strong; }
+.check-box:disabled { -fx-opacity: 0.45; }
+.scroll-bar:vertical { -fx-pref-width: 8; }
+.scroll-bar .thumb:hover { -fx-background-color: -uc-a-strong; }
+.scroll-bar .thumb { -fx-background-color: #2b2b46; }
+.tooltip { -fx-background-color: #16162a; -fx-border-color: -uc-a-mid; -fx-border-radius: 8; -fx-padding: 6 10 6 10; }
+.title-bar { -fx-background-color: linear-gradient(to right, rgba(255,255,255,0.035), rgba(255,255,255,0.015)); }

@@ -28,6 +28,16 @@ public class Config {
     public String theme = "purple";
     public boolean particles = true;
     public boolean glows = true;
+    /** Свой акцентный цвет (тема «custom»), в формате #rrggbb. */
+    public String customColor = "#38bdf8";
+    /** Фон окна: space / graphite / amoled / midnight. */
+    public String background = "space";
+    /** Яркость цветных свечений, 0–100 %. */
+    public int glowPower = 100;
+    /** Количество частиц анимированного фона. */
+    public int particleCount = 70;
+    /** Компактное боковое меню. */
+    public boolean compactMenu = false;
     public int launches = 0;
     public long playSeconds = 0;
     public long lastPlayed = 0;
@@ -49,6 +59,10 @@ public class Config {
                     if (c.version == null || c.version.isBlank()) c.version = DEFAULT_VERSION;
                     if (c.discordAppId == null) c.discordAppId = "";
                     if (c.theme == null) c.theme = "purple";
+                    if (c.customColor == null || !c.customColor.matches("#[0-9a-fA-F]{6}")) c.customColor = "#38bdf8";
+                    if (c.background == null) c.background = "space";
+                    c.glowPower = Math.max(0, Math.min(100, c.glowPower));
+                    if (c.particleCount < 10 || c.particleCount > 120) c.particleCount = 70;
                     if (c.newsVersion == null) c.newsVersion = "";
                     if (c.newsNotes == null) c.newsNotes = "";
                     if (c.servers == null) c.servers = new ArrayList<>();

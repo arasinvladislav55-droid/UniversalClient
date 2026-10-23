@@ -52,6 +52,7 @@ public class LauncherApp extends Application {
     private final StackPane pages = new StackPane();
     private Node currentPage;
     private BorderPane mainArea;
+    private Node sidebarBox;
     private LoginView loginView;
     private SplashView splash;
     private VBox profileCard;
@@ -60,11 +61,10 @@ public class LauncherApp extends Application {
 
     // меню и страницы
     private ToggleButton navHome, navVersions, navShots, navProfile, navTheme, navSettings, navAbout;
-    private ToggleButton navServers, navStorage;
+    private ToggleButton navServers;
     private Node homePage, aboutPage;
     private VersionsPage versionsPage;
     private ServersPage serversPage;
-    private StoragePage storagePage = new StoragePage(this::openUri);
     private ScreenshotsPage shotsPage;
     private ProfilePage profilePage;
     private AppearancePage themePage;
@@ -107,7 +107,7 @@ public class LauncherApp extends Application {
         primaryStage = stage;
         Dirs.init();
         cfg = Config.load();
-        theme = Theme.byId(cfg.theme);
+        theme = Theme.resolve(cfg);
         LogFile.write("Universal Client " + Config.LAUNCHER_VERSION + " запущен");
 
         // ── страницы ──
@@ -115,7 +115,7 @@ public class LauncherApp extends Application {
         serversPage = new ServersPage(cfg, this::joinServer, n -> {});
         shotsPage = new ScreenshotsPage(this::openUri);
         profilePage = new ProfilePage(cfg, this::logout);
-        themePage = new AppearancePage(cfg, this::applyTheme, this::applyEffects);
+        themePage = new AppearancePage(cfg, this::applyTheme, this::applyLook);
         settingsPage = new SettingsPage(cfg, ram -> statRam.setText(Fx.formatRam(ram)), this::applyDiscord, this::openUri);
         aboutPage = buildAboutPage();
         homePage = buildHomePage();
@@ -130,7 +130,8 @@ public class LauncherApp extends Application {
         particles.setMouseTransparent(true);
 
         mainArea = new BorderPane();
-        mainArea.setLeft(buildSidebar());
+        sidebarBox = buildSidebar();
+        mainArea.setLeft(sidebarBox);
         mainArea.setCenter(pages);
         mainArea.setVisible(false);
 
@@ -197,7 +198,8 @@ public class LauncherApp extends Application {
         stage.setScene(scene);
 
         applyTheme(theme);
-        applyEffects();
+        applyLook();
+        stage.iconifiedProperty().addListener((o, was, now) -> applyEffects());
         applyVersionUI();
         updateStats();
 
@@ -344,7 +346,6 @@ public class LauncherApp extends Application {
         navShots = nav("▣   Скриншоты", group, () -> { shotsPage.refresh(); return shotsPage; }, "Скриншоты");
         navProfile = nav("☺   Профиль", group, () -> { profilePage.refresh(); return profilePage; }, "Профиль");
         navTheme = nav("✦   Оформление", group, () -> themePage, "Оформление");
-        navStorage = nav("▤   Хранилище", group, () -> { storagePage.refresh(); return storagePage; }, "Хранилище");
         navSettings = nav("⚙   Настройки", group, () -> settingsPage, "Настройки");
         navAbout = nav("ⓘ   О программе", group, () -> aboutPage, "О программе");
         navHome.setSelected(true);
@@ -358,7 +359,7 @@ public class LauncherApp extends Application {
 
         VBox items = new VBox(3, section("ИГРА"), navHome, navVersions, navServers, navShots,
                 section("АККАУНТ"), navProfile,
-                section("ЛАУНЧЕР"), navTheme, navStorage, navSettings, navAbout);
+                section("ЛАУНЧЕР"), navTheme, navSettings, navAbout);
         // пунктов стало больше — список прокручивается, а бейдж версии и профиль остаются внизу
         ScrollPane navScroll = new ScrollPane(items);
         navScroll.setFitToWidth(true);
@@ -883,10 +884,8 @@ public class LauncherApp extends Application {
         theme = t;
         cfg.theme = t.id();
         cfg.save();
-        window.setStyle(t.css());
-        glowA.setFill(glowFill(t.a(), 0.28));
-        glowB.setFill(glowFill(t.c(), 0.26));
-        heroOrb.setFill(glowFill(t.a(), 0.40));
+        window.setStyle(t.css() + Backdrop.byId(cfg.background).css());
+        paintGlows();
         particles.setColors(t.a(), t.light());
         if (cubes.size() == 3) {
             cubes.get(0).setColors(t.a(), t.b());
@@ -898,10 +897,30 @@ public class LauncherApp extends Application {
         if (loginView != null) loginView.setTheme(t);
     }
 
+    /** Свечения на фоне и в герой-карточке; яркость задаётся ползунком в «Оформлении». */
+    private void paintGlows() {
+        double k = cfg.glowPower / 100.0;
+        glowA.setFill(glowFill(theme.a(), 0.28 * k));
+        glowB.setFill(glowFill(theme.c(), 0.26 * k));
+        heroOrb.setFill(glowFill(theme.a(), 0.40 * k));
+    }
+
     private void applyEffects() {
-        particles.setRunning(cfg.particles);
+        boolean minimized = primaryStage != null && primaryStage.isIconified();
+        particles.setCount(cfg.particleCount);
+        particles.setRunning(cfg.particles && !minimized);   // свёрнутое окно не тратит ресурсы на анимацию
         glowA.setVisible(cfg.glows);
         glowB.setVisible(cfg.glows);
+    }
+
+    /** Любое изменение вида, кроме смены цвета: фон, свечения, частицы, плотность меню. */
+    private void applyLook() {
+        window.setStyle(theme.css() + Backdrop.byId(cfg.background).css());
+        paintGlows();
+        applyEffects();
+        var cls = sidebarBox.getStyleClass();
+        cls.remove("compact");
+        if (cfg.compactMenu) cls.add("compact");
     }
 
     // ───────────────────────── Discord ─────────────────────────
