@@ -1,6 +1,6 @@
 {
-    "version":  "2.9.0",
-    "url":  "https://github.com/arasinvladislav55-droid/UniversalClient/releases/download/v2.9.0/UniversalClient-2.9.0.exe",
-    "sha256":  "43e3552a264d8cf86cb984cade9a879eebe93248b48704df96846a1d3bf285f2",
-    "notes":  "Обновленное оформление лаунчера, добавка оформлений."
+    "version":  "3.1.0",
+    "url":  "https://github.com/arasinvladislav55-droid/UniversalClient/releases/download/v3.1.0/UniversalClient-3.1.0.exe",
+    "sha256":  "4afb3ba817389fc8cd2be9e6fd93f8e9c99220cec4c2f02a36b7e8898572fa35",
+    "notes":  "Исправления и улучшения"
 }
