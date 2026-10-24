@@ -10,6 +10,7 @@ import java.util.List;
 public record Theme(String id, String name, Color a, Color b, Color c) {
 
     public static final List<Theme> ALL = List.of(
+            of("amber", "Янтарь", "#ffb454", "#ff8a3d", "#ffd98a"),
             of("purple", "Фиолетовый", "#8b5cf6", "#6366f1", "#22d3ee"),
             of("ocean", "Океан", "#0ea5e9", "#3b82f6", "#a78bfa"),
             of("rose", "Роза", "#ec4899", "#f43f5e", "#fb923c"),

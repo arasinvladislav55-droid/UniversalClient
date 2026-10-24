@@ -6,6 +6,7 @@ import java.util.List;
 public record Backdrop(String id, String name, String c1, String c2, String c3) {
 
     public static final List<Backdrop> ALL = List.of(
+            new Backdrop("galaxy", "Галактика", "#03040b", "#071433", "#0e2250"),
             new Backdrop("space", "Космос", "#0a0a11", "#0e0e1a", "#120f20"),
             new Backdrop("midnight", "Полночь", "#060b16", "#0a1224", "#0d1830"),
             new Backdrop("graphite", "Графит", "#0f1012", "#16181b", "#1b1d21"),

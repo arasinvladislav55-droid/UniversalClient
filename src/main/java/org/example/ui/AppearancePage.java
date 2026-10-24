@@ -63,8 +63,11 @@ public class AppearancePage extends VBox {
         CheckBox glows = check("Цветные свечения на фоне", cfg.glows, v -> cfg.glows = v);
         Node power = sliderRow("Яркость свечений", 0, 100, cfg.glowPower, v -> v + " %", v -> cfg.glowPower = v);
         power.disableProperty().bind(glows.selectedProperty().not());
+        CheckBox planetBox = check("Вращающаяся планета на фоне", cfg.planet, v -> cfg.planet = v);
+        Node planetSpeed = sliderRow("Скорость вращения планеты", 0, 400, cfg.planetSpeed, v -> (v / 100.0) + "×", v -> cfg.planetSpeed = v);
+        planetSpeed.disableProperty().bind(planetBox.selectedProperty().not());
         VBox fxCard = card("Эффекты", "Меньше эффектов — меньше нагрузка на процессор и видеокарту",
-                particles, density, glows, power);
+                planetBox, planetSpeed, particles, density, glows, power);
 
         // ── интерфейс ──
         CheckBox compact = check("Компактное боковое меню", cfg.compactMenu, v -> cfg.compactMenu = v);

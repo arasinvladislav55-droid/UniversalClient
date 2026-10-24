@@ -11,7 +11,7 @@ import java.util.List;
 /** Настройки лаунчера (хранятся в launcher.json). */
 public class Config {
     public static final String DEFAULT_VERSION = "1.21.11";
-    public static final String LAUNCHER_VERSION = "2.9.0";
+    public static final String LAUNCHER_VERSION = "3.1.0";
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = Dirs.ROOT.resolve("launcher.json");
@@ -25,19 +25,24 @@ public class Config {
     public String javaPath = "";
     public boolean closeOnLaunch = false;
     public boolean visualPack = true;
-    public String theme = "purple";
+    public String theme = "amber";
     public boolean particles = true;
     public boolean glows = true;
     /** Свой акцентный цвет (тема «custom»), в формате #rrggbb. */
     public String customColor = "#38bdf8";
     /** Фон окна: space / graphite / amoled / midnight. */
-    public String background = "space";
+    public String background = "galaxy";
     /** Яркость цветных свечений, 0–100 %. */
     public int glowPower = 100;
     /** Количество частиц анимированного фона. */
     public int particleCount = 70;
     /** Компактное боковое меню. */
     public boolean compactMenu = false;
+    /** Вращающаяся планета на фоне и скорость вращения в процентах (0 — стоит). */
+    public boolean planet = true;
+    public int planetSpeed = 100;
+    /** Версия оформления: при первом запуске нового оформления выставляются тема «Янтарь» и фон «Галактика». */
+    public int uiVersion = 0;
     public int launches = 0;
     public long playSeconds = 0;
     public long lastPlayed = 0;
@@ -61,6 +66,12 @@ public class Config {
                     if (c.theme == null) c.theme = "purple";
                     if (c.customColor == null || !c.customColor.matches("#[0-9a-fA-F]{6}")) c.customColor = "#38bdf8";
                     if (c.background == null) c.background = "space";
+                    if (c.uiVersion < 3) {
+                        c.uiVersion = 3;
+                        c.theme = "amber";
+                        c.background = "galaxy";
+                    }
+                    c.planetSpeed = Math.max(0, Math.min(400, c.planetSpeed));
                     c.glowPower = Math.max(0, Math.min(100, c.glowPower));
                     if (c.particleCount < 10 || c.particleCount > 120) c.particleCount = 70;
                     if (c.newsVersion == null) c.newsVersion = "";

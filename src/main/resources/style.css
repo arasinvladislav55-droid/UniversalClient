@@ -716,3 +716,170 @@
 .scroll-bar .thumb { -fx-background-color: #2b2b46; }
 .tooltip { -fx-background-color: #16162a; -fx-border-color: -uc-a-mid; -fx-border-radius: 8; -fx-padding: 6 10 6 10; }
 .title-bar { -fx-background-color: linear-gradient(to right, rgba(255,255,255,0.035), rgba(255,255,255,0.015)); }
+
+/* ═════════════ v3.1 — экран входа (новый дизайн) ═════════════
+   Один акцент (-uc-a), без градиентов и свечений. Сетка 4/8 px, скругления 8/10/16. */
+
+.login-view { -fx-background-color: rgba(7,7,12,0.82); }
+
+.lv-shell {
+    -fx-background-color: #111119;
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255,255,255,0.09);
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 40, 0, 0, 16);
+}
+.lv-card { -fx-background-color: transparent; }
+
+.lv-brand { -fx-text-fill: #f3f4f6; -fx-font-size: 14px; -fx-font-weight: bold; }
+.lv-version { -fx-text-fill: #6b7280; -fx-font-size: 12px; }
+
+.lv-title { -fx-text-fill: #ffffff; -fx-font-size: 24px; -fx-font-weight: bold; }
+.lv-sub { -fx-text-fill: #9ca3af; -fx-font-size: 13px; }
+
+.lv-label { -fx-text-fill: #d1d5db; -fx-font-size: 12px; -fx-font-weight: bold; }
+.lv-counter { -fx-text-fill: #6b7280; -fx-font-size: 12px; }
+.lv-line { -fx-background-color: rgba(255,255,255,0.07); }
+
+.lv-row {
+    -fx-background-color: rgba(255,255,255,0.03);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255,255,255,0.07);
+    -fx-border-radius: 10;
+    -fx-padding: 8 14 8 10;
+}
+.lv-row-name { -fx-text-fill: #f3f4f6; -fx-font-size: 13.5px; -fx-font-weight: bold; }
+.lv-row-meta { -fx-text-fill: #6b7280; -fx-font-size: 11.5px; }
+.lv-chevron { -fx-text-fill: #4b5563; -fx-font-size: 20px; }
+.lv-row:hover { -fx-background-color: rgba(255,255,255,0.055); -fx-border-color: rgba(255,255,255,0.16); }
+.lv-row:hover .lv-chevron { -fx-text-fill: -uc-light; }
+
+.lv-del {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6b7280;
+    -fx-background-radius: 6;
+    -fx-padding: 3 7 3 7;
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+}
+.lv-del:hover { -fx-background-color: rgba(239,68,68,0.16); -fx-text-fill: #f87171; }
+
+.lv-input {
+    -fx-background-color: #0b0b12;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-radius: 10;
+    -fx-padding: 0 14 0 14;
+    -fx-font-size: 14px;
+    -fx-text-fill: #f3f4f6;
+    -fx-prompt-text-fill: #4b5563;
+}
+.lv-input:focused { -fx-border-color: -uc-a; -fx-effect: none; }
+.lv-input-error, .lv-input-error:focused { -fx-border-color: #ef4444; -fx-effect: none; }
+
+.lv-hint { -fx-text-fill: #6b7280; -fx-font-size: 12px; }
+.lv-hint-error { -fx-text-fill: #f87171; }
+
+.lv-avatar-empty {
+    -fx-background-color: #0b0b12;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255,255,255,0.12);
+    -fx-border-radius: 10;
+    -fx-text-fill: #4b5563;
+    -fx-font-size: 16px;
+}
+
+.lv-primary {
+    -fx-background-color: -uc-a;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+.lv-primary:hover { -fx-background-color: derive(-uc-a, 10%); }
+.lv-primary:pressed { -fx-background-color: derive(-uc-a, -12%); }
+
+.lv-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-radius: 10;
+}
+.lv-secondary:disabled { -fx-opacity: 0.55; }
+
+.lv-meta { -fx-text-fill: #6b7280; -fx-font-size: 11.5px; }
+
+.lv-welcome { -fx-background-color: #111119; -fx-background-radius: 16; }
+.lv-welcome-sub { -fx-text-fill: #9ca3af; -fx-font-size: 14px; }
+.lv-welcome-name { -fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold; }
+
+/* ═══════════════════ v3 — новый стиль: стекло, янтарный акцент, планета ═══════════════════ */
+
+.window { -fx-border-color: rgba(255,255,255,0.14); }
+.title-bar { -fx-background-color: rgba(255,255,255,0.03); }
+.title-logo { -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; }
+.crumb { -fx-text-fill: rgba(241,244,255,0.62); -fx-font-size: 12.5px; }
+
+/* меню — матовое стекло */
+.sidebar { -fx-background-color: rgba(7,10,26,0.55); -fx-border-color: rgba(255,255,255,0.08); -fx-border-width: 0 1 0 0; }
+.nav-section { -fx-text-fill: rgba(241,244,255,0.42); -fx-font-size: 11.5px; -fx-font-weight: bold; -fx-padding: 12 0 4 12; }
+.nav-button { -fx-background-radius: 11; -fx-border-radius: 11; -fx-text-fill: rgba(241,244,255,0.62); -fx-font-size: 13.5px; }
+.nav-button:hover { -fx-background-color: rgba(255,255,255,0.07); -fx-text-fill: white; }
+.nav-button:selected {
+    -fx-background-color: linear-gradient(to right, -uc-a-mid, transparent);
+    -fx-border-color: transparent transparent transparent -uc-a;
+    -fx-border-width: 0 0 0 3;
+    -fx-text-fill: white;
+}
+
+/* главная */
+.hero-card { -fx-background-color: transparent; -fx-border-color: transparent; -fx-background-radius: 0; }
+.hero-title2 {
+    -fx-font-size: 64px;
+    -fx-font-family: "Segoe UI Light", "Segoe UI";
+    -fx-font-weight: normal;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 28, 0, 0, 8);
+}
+.hero-sub2 { -fx-text-fill: rgba(241,244,255,0.62); -fx-font-size: 15px; }
+.hero-greeting { -fx-text-fill: rgba(241,244,255,0.62); }
+.home-play {
+    -fx-background-color: -uc-a;
+    -fx-text-fill: #120b04;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 99;
+    -fx-effect: dropshadow(gaussian, -uc-a-strong, 26, 0, 0, 6);
+}
+.home-play:hover { -fx-background-color: derive(-uc-a, 14%); }
+.home-play:pressed { -fx-background-color: derive(-uc-a, -10%); }
+.chip-button {
+    -fx-background-color: rgba(9,13,32,0.55);
+    -fx-text-fill: white;
+    -fx-background-radius: 99;
+    -fx-border-color: rgba(255,255,255,0.14);
+    -fx-border-radius: 99;
+    -fx-padding: 17 24 17 24;
+}
+.chip-button:hover { -fx-background-color: rgba(255,255,255,0.14); -fx-border-color: rgba(255,255,255,0.30); }
+.progress-bar > .track { -fx-background-color: rgba(255,255,255,0.16); }
+.page-title { -fx-font-size: 28px; -fx-font-family: "Segoe UI Light", "Segoe UI"; -fx-font-weight: normal; }
+
+/* карточки и поля — стекло */
+.card, .stat-card, .list-row, .note-card, .ver-card, .shot-card, .swatch {
+    -fx-background-color: rgba(9,13,32,0.55);
+    -fx-border-color: rgba(255,255,255,0.12);
+}
+.card:hover, .list-row:hover { -fx-border-color: -uc-a-strong; }
+.input { -fx-background-color: rgba(4,6,18,0.70); -fx-border-color: rgba(255,255,255,0.12); }
+.secondary-button { -fx-background-color: rgba(255,255,255,0.07); -fx-border-color: rgba(255,255,255,0.12); -fx-border-radius: 10; }
+.accent-button, .login-go { -fx-text-fill: #120b04; }
+.accent-button .ico { -fx-stroke: #120b04; }
+.chip:selected { -fx-text-fill: #120b04; }
+
+/* экран входа: планета просвечивает сквозь затемнение */
+.login-view { -fx-background-color: rgba(3,5,14,0.50); }

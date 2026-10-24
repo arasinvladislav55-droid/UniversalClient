@@ -55,9 +55,8 @@ public class LauncherApp extends Application {
     private Node sidebarBox;
     private LoginView loginView;
     private SplashView splash;
-    private VBox profileCard;
-    private Button logoutBtn;
-    private Label crumb, discordPill, mcBadge;
+    private Label crumb, discordPill, heroSub;
+    private PlanetView planet;
 
     // меню и страницы
     private ToggleButton navHome, navVersions, navShots, navProfile, navTheme, navSettings, navAbout;
@@ -128,6 +127,7 @@ public class LauncherApp extends Application {
         particles = new ParticleCanvas();
         particles.setManaged(false);
         particles.setMouseTransparent(true);
+        planet = new PlanetView();
 
         mainArea = new BorderPane();
         sidebarBox = buildSidebar();
@@ -139,7 +139,7 @@ public class LauncherApp extends Application {
         loginView.setVisible(false);
         splash = new SplashView(theme);
 
-        content = new StackPane(glowA, glowB, particles, mainArea, loginView, splash);
+        content = new StackPane(glowA, glowB, particles, planet, mainArea, loginView, splash);
         content.getStyleClass().add("center");
         content.setMinSize(0, 0);
         particles.widthProperty().bind(content.widthProperty());
@@ -234,6 +234,7 @@ public class LauncherApp extends Application {
             show(homePage, "Главная");
         } else {
             atLogin = true;
+        planet.moveTo("login");
             refreshPresence();
             loginView.setVisible(true);
             loginView.refresh();
@@ -265,6 +266,7 @@ public class LauncherApp extends Application {
     private void logout() {
         if (playBtn.isDisabled()) return;
         atLogin = true;
+        planet.moveTo("login");
         refreshPresence();
         cfg.autoLogin = false;
         cfg.save();
@@ -278,29 +280,15 @@ public class LauncherApp extends Application {
     private void updateProfileUI() {
         Account a = cfg.current();
         greeting.setText(a == null ? "Привет!" : "Привет, " + a.name);
-        profileCard.getChildren().clear();
-        if (a == null) return;
-        Label n = new Label(a.name);
-        n.getStyleClass().add("row-name");
-        Label t = new Label("Offline-профиль");
-        t.getStyleClass().add("muted-small");
-        HBox top = new HBox(10, new AvatarView(a.name, 34), new VBox(2, n, t));
-        top.setAlignment(Pos.CENTER_LEFT);
-        logoutBtn = new Button("Сменить профиль");
-        logoutBtn.getStyleClass().add("secondary-button");
-        logoutBtn.setMaxWidth(Double.MAX_VALUE);
-        logoutBtn.setOnAction(e -> logout());
-        logoutBtn.setDisable(playBtn != null && playBtn.isDisabled());
-        profileCard.getChildren().addAll(top, logoutBtn);
     }
 
     // ───────────────────────── Заголовок окна ─────────────────────────
 
     private Node buildTitleBar(Stage stage) {
         ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icon.png"), 22, 22, true, true));
-        Label logo = new Label("UNIVERSAL CLIENT");
+        Label logo = new Label("Universal Client");
         logo.getStyleClass().add("title-logo");
-        Label sep = new Label("›");
+        Label sep = new Label("/");
         sep.getStyleClass().add("crumb-sep");
         crumb = new Label("Главная");
         crumb.getStyleClass().add("crumb");
@@ -351,16 +339,10 @@ public class LauncherApp extends Application {
         navHome.setSelected(true);
         group.selectedToggleProperty().addListener((o, old, now) -> { if (now == null && old != null) old.setSelected(true); });
 
-        mcBadge = new Label();
-        mcBadge.getStyleClass().add("badge");
-
-        profileCard = new VBox(10);
-        profileCard.getStyleClass().add("profile-card");
-
-        VBox items = new VBox(3, section("ИГРА"), navHome, navVersions, navServers, navShots,
-                section("АККАУНТ"), navProfile,
-                section("ЛАУНЧЕР"), navTheme, navSettings, navAbout);
-        // пунктов стало больше — список прокручивается, а бейдж версии и профиль остаются внизу
+        VBox items = new VBox(3, section("Игра"), navHome, navVersions, navServers, navShots,
+                section("Аккаунт"), navProfile,
+                section("Лаунчер"), navTheme, navSettings, navAbout);
+        // пунктов много — список прокручивается
         ScrollPane navScroll = new ScrollPane(items);
         navScroll.setFitToWidth(true);
         navScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -368,7 +350,7 @@ public class LauncherApp extends Application {
         navScroll.getStyleClass().add("version-scroll");
         VBox.setVgrow(navScroll, Priority.ALWAYS);
 
-        VBox box = new VBox(3, navScroll, mcBadge, Fx.gap(4), profileCard);
+        VBox box = new VBox(3, navScroll);
         box.setPadding(new Insets(14, 14, 16, 14));
         box.setPrefWidth(228);
         box.setMinWidth(228);
@@ -398,6 +380,7 @@ public class LauncherApp extends Application {
         pages.getChildren().setAll(page);
         Fx.appear(page, 16, 320);
         crumb.setText(title);
+        planet.moveTo("Главная".equals(title) ? "home" : "Оформление".equals(title) ? "look" : "other");
         refreshPresence();
         if (page == homePage) playHomeIntro();
     }
@@ -414,12 +397,16 @@ public class LauncherApp extends Application {
 
         greeting = new Label("Привет!");
         greeting.getStyleClass().add("hero-greeting");
-        Label title = new Label("UNIVERSAL CLIENT");
+        Label title = new Label("Universal Client");
         title.getStyleClass().add("hero-title2");
+        heroSub = new Label();
+        heroSub.getStyleClass().add("hero-sub2");
+        heroSub.setWrapText(true);
+        heroSub.setMaxWidth(360);
 
-        playBtn = new Button("▶    ИГРАТЬ");
+        playBtn = new Button("▶   Играть");
         playBtn.getStyleClass().add("home-play");
-        playBtn.setPrefSize(236, 54);
+        playBtn.setPrefSize(200, 58);
         playBtn.setOnAction(e -> onPlayClicked());
         Fx.hoverScale(playBtn, 1.05);
         playGlow = Fx.pulseGlow(playBtn, theme.a());
@@ -438,55 +425,13 @@ public class LauncherApp extends Application {
         status = new Label("");
         status.getStyleClass().add("muted");
 
-        VBox left = new VBox(8, state, greeting, title, Fx.gap(4), actions, bar, status);
-        left.setPadding(new Insets(24, 0, 18, 30));
-        left.setAlignment(Pos.CENTER_LEFT);
+        VBox left = new VBox(8, state, greeting, title, heroSub, Fx.gap(10), actions, bar, status);
+        left.setAlignment(Pos.BOTTOM_LEFT);
 
-        // кубики справа
-        StackPane cubeArea = new StackPane();
-        cubeArea.setPrefWidth(290);
-        cubeArea.setMinWidth(290);
-        CubeArt big = new CubeArt(58, theme.a(), theme.b());
-        CubeArt mid = new CubeArt(20, theme.c(), theme.a());
-        CubeArt small = new CubeArt(13, theme.a(), theme.c());
-        mid.setTranslateX(-98);
-        mid.setTranslateY(-58);
-        small.setTranslateX(104);
-        small.setTranslateY(52);
-        cubeArea.getChildren().addAll(big, mid, small);
-        cubes.add(big);
-        cubes.add(mid);
-        cubes.add(small);
-        Fx.floatY(big, 12, 3.2, 0);
-        Fx.floatY(mid, 9, 2.6, 0.4);
-        Fx.floatY(small, 10, 3.8, 0.9);
-        RotateTransition sway = new RotateTransition(Duration.seconds(4), big);
-        sway.setFromAngle(-4);
-        sway.setToAngle(4);
-        sway.setAutoReverse(true);
-        sway.setCycleCount(Animation.INDEFINITE);
-        sway.setInterpolator(Interpolator.EASE_BOTH);
-        sway.play();
-
-        heroOrb = new Circle(170);
-        heroOrb.setMouseTransparent(true);
-        StackPane.setAlignment(heroOrb, Pos.TOP_RIGHT);
-        heroOrb.setTranslateX(70);
-        heroOrb.setTranslateY(-80);
-
-        HBox heroRow = new HBox(left, Fx.spacer(), cubeArea);
-        heroRow.setAlignment(Pos.CENTER_LEFT);
-        heroCard = new StackPane(heroOrb, heroRow);
+        heroOrb = new Circle(1);        // свечение больше не рисуется; поле оставлено для темы
+        heroCard = new StackPane(left);
         heroCard.getStyleClass().add("hero-card");
-        heroCard.setPrefHeight(250);
-        heroCard.setMinHeight(250);
-        heroCard.setMaxHeight(250);
-        Rectangle heroClip = new Rectangle();
-        heroClip.setArcWidth(44);
-        heroClip.setArcHeight(44);
-        heroClip.widthProperty().bind(heroCard.widthProperty());
-        heroClip.heightProperty().bind(heroCard.heightProperty());
-        heroCard.setClip(heroClip);
+        StackPane.setAlignment(left, Pos.BOTTOM_LEFT);
 
         // ── статистика ──
         HBox stats = new HBox(14,
@@ -528,8 +473,9 @@ public class LauncherApp extends Application {
         bottom.setPrefHeight(150);
         bottom.setMaxHeight(150);
 
-        VBox page = new VBox(14, heroCard, stats, bottom);
-        page.setPadding(new Insets(20, 26, 16, 26));
+        VBox.setVgrow(heroCard, Priority.ALWAYS);
+        VBox page = new VBox(heroCard);
+        page.setPadding(new Insets(28, 34, 30, 34));
         return page;
     }
 
@@ -625,9 +571,9 @@ public class LauncherApp extends Application {
     }
 
     private void applyVersionUI() {
-        versionChip.setText("Версия " + cfg.version + "  ›");
+        versionChip.setText("Версия " + cfg.version);
+        heroSub.setText("Minecraft " + cfg.version + ", сборка " + Config.LAUNCHER_VERSION + ". Всё готово к запуску.");
         statVersion.setText(cfg.version);
-        mcBadge.setText("Minecraft " + cfg.version);
     }
 
     private void updateStats() {
@@ -667,8 +613,7 @@ public class LauncherApp extends Application {
         final String version = cfg.version;
         playBtn.setDisable(true);
         versionChip.setDisable(true);
-        if (logoutBtn != null) logoutBtn.setDisable(true);
-        playBtn.setText("ЗАГРУЗКА...");
+        playBtn.setText("Загрузка…");
         setHeroState("ПОДГОТОВКА ИГРЫ", Color.web("#fbbf24"));
         bar.setVisible(true);
         bar.setProgress(-1);
@@ -756,7 +701,6 @@ public class LauncherApp extends Application {
         refreshPlayButton();
         bar.setVisible(false);
         status.setText(message);
-        if (logoutBtn != null) logoutBtn.setDisable(false);
     }
 
     // ───────────────────────── Обновление лаунчера ─────────────────────────
@@ -801,10 +745,10 @@ public class LauncherApp extends Application {
     private void refreshPlayButton() {
         if (playBtn == null) return;
         if (pendingUpdate != null) {
-            playBtn.setText("⟳    ОБНОВИТЬ");
+            playBtn.setText("⟳   Обновить");
             setHeroState("ДОСТУПНО ОБНОВЛЕНИЕ " + pendingUpdate.version(), Color.web("#fbbf24"));
         } else {
-            playBtn.setText("▶    ИГРАТЬ");
+            playBtn.setText("▶   Играть");
             setHeroState("ГОТОВ К ЗАПУСКУ", Color.web("#34d399"));
         }
     }
@@ -820,7 +764,6 @@ public class LauncherApp extends Application {
         updating = true;
         playBtn.setDisable(true);
         versionChip.setDisable(true);
-        if (logoutBtn != null) logoutBtn.setDisable(true);
         playBtn.setText("СКАЧИВАНИЕ...");
         setHeroState("ОБНОВЛЕНИЕ " + info.version(), Color.web("#fbbf24"));
         bar.setVisible(true);
@@ -864,7 +807,6 @@ public class LauncherApp extends Application {
         updating = false;
         playBtn.setDisable(false);
         versionChip.setDisable(false);
-        if (logoutBtn != null) logoutBtn.setDisable(false);
         bar.setVisible(false);
         refreshPlayButton();
         String why = ex == null ? "неизвестная ошибка" : ex.getMessage();
@@ -908,6 +850,7 @@ public class LauncherApp extends Application {
     private void applyEffects() {
         boolean minimized = primaryStage != null && primaryStage.isIconified();
         particles.setCount(cfg.particleCount);
+        planet.configure(cfg.planet, cfg.planetSpeed, !minimized);
         particles.setRunning(cfg.particles && !minimized);   // свёрнутое окно не тратит ресурсы на анимацию
         glowA.setVisible(cfg.glows);
         glowB.setVisible(cfg.glows);
