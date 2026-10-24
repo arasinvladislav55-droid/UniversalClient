@@ -11,7 +11,7 @@ import java.util.List;
 /** Настройки лаунчера (хранятся в launcher.json). */
 public class Config {
     public static final String DEFAULT_VERSION = "1.21.11";
-    public static final String LAUNCHER_VERSION = "1.0.0";
+    public static final String LAUNCHER_VERSION = "2.0.0";
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = Dirs.ROOT.resolve("launcher.json");
